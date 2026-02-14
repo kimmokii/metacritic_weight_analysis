@@ -26,53 +26,68 @@ This results in a **subset-normalized weighted average model** with explicit unc
 
 ---
 
-## Mathematical Model 
+## Mathematical Model
 
-For each movie *j*, let **C_j** be the set of critics who reviewed that movie.
+For each movie $j$, let $C_j$ be the set of critics who reviewed that movie.
 
 ### Latent critic parameters
 
-Each critic *k* has two global (movie-independent) parameters:
+Each critic $k$ has two global (movie-independent) latent parameters:
 
-- **Log-weight**: `u_k`  (real-valued)
-- **Bias**: `b_k` (in metascore points, can be negative or positive)
+- Log-weight: $u_k \in \mathbb{R}$
+- Bias: $b_k \in \mathbb{R}$ (in metascore points)
 
-To improve identifiability we center these parameters:
+To ensure identifiability, both parameters are centered:
 
-- `u_k <- u_k - mean(u)`
-- `b_k <- b_k - mean(b)`
+$$
+u_k \leftarrow u_k - \frac{1}{K}\sum_{k=1}^{K} u_k
+$$
+
+$$
+b_k \leftarrow b_k - \frac{1}{K}\sum_{k=1}^{K} b_k
+$$
 
 ### Movie-level normalized weights (subset softmax)
 
-Weights are **positive** and **renormalized within each movie** over only the critics who appear in that movie:
+Log-weights are exponentiated to obtain positive unnormalized weights:
 
-- Unnormalized weight: `alpha_k = exp(u_k)`
-- Normalized weight for movie j:  
-  `w_jk = alpha_k / sum_{k' in C_j} alpha_{k'}`
+$$
+\alpha_k = \exp(u_k)
+$$
+
+For a given movie $j$, weights are normalized **only over critics who appear in that movie**:
+
+$$
+w_{jk} = \frac{\alpha_k}{\sum_{k' \in C_j} \alpha_{k'}}
+$$
 
 This guarantees:
 
-- `w_jk > 0`
-- `sum_{k in C_j} w_jk = 1` (for each movie j)
-- If a critic is absent from a movie, they simply do not enter the sum (automatic rescaling).
+- $w_{jk} > 0$
+- $\sum_{k \in C_j} w_{jk} = 1$ (for each movie)
+- Automatic rescaling when critics are missing
 
 ### Expected metascore
 
-Let `s_jk` be critic k’s observed score for movie j (0–100).  
+Let $s_{jk}$ be critic $k$’s observed score for movie $j$ (0–100).
 The expected metascore is a weighted average of bias-adjusted critic scores:
 
-`mu_j = sum_{k in C_j} w_jk * (s_jk + b_k)`
+$$
+\mu_j = \sum_{k \in C_j} w_{jk} \, (s_{jk} + b_k)
+$$
 
 ### Likelihood
 
-Observed metascores are modeled with a robust Student-t likelihood:
+Observed metascores are modeled using a robust Student-t likelihood:
 
-`metascore_j ~ StudentT(nu, mu_j, sigma)`
+$$
+\text{metascore}_j \sim \text{StudentT}(\nu, \mu_j, \sigma)
+$$
 
 where:
 
-- `sigma` is residual noise on the 0–100 metascore scale
-- `nu` controls tail-heaviness (robustness to outliers)
+- $\sigma$ is residual noise on the 0–100 scale
+- $\nu$ controls tail heaviness (robustness to outliers)
 
 ---
 
