@@ -26,71 +26,53 @@ This results in a **subset-normalized weighted average model** with explicit unc
 
 ---
 
-## Mathematical Model
+## Mathematical Model 
 
-For movie \( j \) with critics \( k \in \mathcal{C}_j \):
+For each movie *j*, let **C_j** be the set of critics who reviewed that movie.
 
 ### Latent critic parameters
 
-- Log-weight:  
-  \[
-  u_k \in \mathbb{R}
-  \]
-- Bias (in score units):  
-  \[
-  b_k \in \mathbb{R}
-  \]
+Each critic *k* has two global (movie-independent) parameters:
 
-To ensure identifiability:
-- \( u_k \) are centered: \( u_k - \bar{u} \)
-- \( b_k \) are centered: \( b_k - \bar{b} \)
+- **Log-weight**: `u_k`  (real-valued)
+- **Bias**: `b_k` (in metascore points, can be negative or positive)
 
-### Movie-level normalized weights
+To improve identifiability we center these parameters:
 
-For a given movie:
-\[
-w_{jk} = \frac{\exp(u_k)}{\sum_{k' \in \mathcal{C}_j} \exp(u_{k'})}
-\]
+- `u_k <- u_k - mean(u)`
+- `b_k <- b_k - mean(b)`
+
+### Movie-level normalized weights (subset softmax)
+
+Weights are **positive** and **renormalized within each movie** over only the critics who appear in that movie:
+
+- Unnormalized weight: `alpha_k = exp(u_k)`
+- Normalized weight for movie j:  
+  `w_jk = alpha_k / sum_{k' in C_j} alpha_{k'}`
 
 This guarantees:
-- Positivity
-- Automatic rescaling when critics are missing
-- Weights sum to 1 **within each movie**
+
+- `w_jk > 0`
+- `sum_{k in C_j} w_jk = 1` (for each movie j)
+- If a critic is absent from a movie, they simply do not enter the sum (automatic rescaling).
 
 ### Expected metascore
 
-\[
-\mu_j = \sum_{k \in \mathcal{C}_j} w_{jk} \cdot (s_{jk} + b_k)
-\]
+Let `s_jk` be critic k’s observed score for movie j (0–100).  
+The expected metascore is a weighted average of bias-adjusted critic scores:
 
-where:
-- \( s_{jk} \) is the observed critic score
+`mu_j = sum_{k in C_j} w_jk * (s_jk + b_k)`
 
 ### Likelihood
 
-Observed metascore:
-\[
-\text{metascore}_j \sim \text{Student-t}(\nu, \mu_j, \sigma)
-\]
+Observed metascores are modeled with a robust Student-t likelihood:
 
-A Student-t likelihood is used for robustness against outliers and aggregation noise.
+`metascore_j ~ StudentT(nu, mu_j, sigma)`
 
----
+where:
 
-## Prior Choices and Rationale
-
-All priors are **weakly informative and regularizing**, chosen to improve identifiability and sampling stability:
-
-| Parameter | Prior | Motivation |
-|---------|------|------------|
-| \( u_k \) | \( \mathcal{N}(0, \tau_u) \) | Allows flexible relative influence |
-| \( b_k \) | \( \mathcal{N}(0, \tau_b) \) | Captures critic bias in score units |
-| \( \tau_u \) | Exponential(1) | Regularizes influence variability |
-| \( \tau_b \) | Exponential(0.2) | Bias typically within a few points |
-| \( \sigma \) | Exponential(0.1) | Metascore noise (~10 points mean) |
-| \( \nu \) | Gamma(2, 0.1) | Moderately heavy tails |
-
-Strict lower bounds are applied to scale parameters to avoid pathological zero-scale behavior in Stan.
+- `sigma` is residual noise on the 0–100 metascore scale
+- `nu` controls tail-heaviness (robustness to outliers)
 
 ---
 
