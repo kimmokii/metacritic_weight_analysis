@@ -123,6 +123,40 @@ These results allow ranking critics by:
 - Bias magnitude
 - Certainty of estimation
 
+## Critic influence weights
+
+The figure below shows the **posterior mean normalized critic weights**
+(averaged across movies where the critic appears).
+
+<p align="center">
+  <img src="plots/weights_top_30_2015.png" width="700">
+</p>
+
+## Posterior Predictive Check
+
+<p align="center">
+  <img src="plots/ppcheck_scatter_2015.png" width="700">
+</p>
+
+## Critic bias estimates
+
+<p align="center">
+  <img src="plots/bias_top_30_2015.png" width="700">
+</p>
+
+## Residual diagnostics
+
+<p align="center">
+  <img src="plots/residuals_2015.png" width="700">
+</p>
+
+## Trace plots
+
+<p align="center">
+  <img src="plots/trace_core_params_2015.png" width="700">
+</p>
+
+
 ---
 
 ## What This Project Is *Not*
