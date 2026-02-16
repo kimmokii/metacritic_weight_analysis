@@ -132,11 +132,28 @@ The figure below shows the **posterior mean normalized critic weights**
   <img src="plots/weights_top_30_2015.png" width="700">
 </p>
 
+Higher values mean a critic tends to receive more relative weight within movies they review; overlapping intervals imply the data cannot reliably distinguish their influence.
+
 ## Posterior Predictive Check
 
 <p align="center">
   <img src="plots/ppcheck_scatter_2015.png" width="700">
 </p>
+
+This plot compares the model’s posterior mean predictions ($\mu_{hat}$) to the observed Metascore values.
+
+- Gray points: individual movies (predicted vs. observed score).
+
+- Dashed line: identity line $𝑦=𝑥$ (perfect agreement)
+
+- Blue line: LOESS (LOcal regrESSion) highlighting systematic trends.
+
+Interpretation:
+Points closely follow the identity line and the smooth shows no systematic deviation, indicating that the inferred critic weights and biases reproduce the observed Metascore as intended.
+
+Note:
+This check validates model consistency and numerical correctness. It does not demonstrate out-of-sample predictive performance or prove uniqueness of the inferred weights.
+
 
 ## Critic bias estimates
 
@@ -144,17 +161,23 @@ The figure below shows the **posterior mean normalized critic weights**
   <img src="plots/bias_top_30_2015.png" width="700">
 </p>
 
+Positive values indicate a tendency to score above the consensus, negative values below it; wide intervals reflect limited information rather than extreme bias.
+
 ## Residual diagnostics
 
 <p align="center">
   <img src="plots/residuals_2015.png" width="700">
 </p>
 
+This residual plot shows that prediction errors are roughly centered around zero with increasing spread at higher metascores, indicating heteroskedasticity not explicitly modeled, but no strong systematic bias in the mean prediction.
+
 ## Trace plots
 
 <p align="center">
   <img src="plots/trace_core_params_2015.png" width="700">
 </p>
+
+The trace plots show good mixing and stationarity across all chains for the main parameters, indicating stable sampling and no obvious convergence issues.
 
 
 ---
