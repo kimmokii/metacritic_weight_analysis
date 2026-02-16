@@ -78,7 +78,7 @@ $$
 
 ### Likelihood
 
-Observed metascores are modeled using a robust Student-t likelihood:
+Observed metascores are modeled using a Student-t likelihood:
 
 $$
 \text{metascore}_j \sim \text{StudentT}(\nu, \mu_j, \sigma)
@@ -97,11 +97,6 @@ Student’s t “expects surprises”: extreme metascore values are tolerated wi
 
 - Implemented in **Stan** via **cmdstanr**
 - Sampler: **NUTS (No-U-Turn Sampler)** with adaptive step size
-- Multiple chains with convergence diagnostics:
-  - R-hat
-  - Effective Sample Size
-  - E-BFMI
-  - Divergence checks
 - Defensive runtime checks prevent silent NaN / Inf propagation
 
 Posterior summaries include:
@@ -126,6 +121,8 @@ These results allow ranking critics by:
 - Certainty of estimation
 
 ## Critic influence weights
+
+The figures below are generater using Metacritic data from 2015, fetched via [metacritic_fetcher](https://github.com/kimmokii/metacritic_fetcher).
 
 The figure below shows the **posterior mean normalized critic weights**
 (averaged across movies where the critic appears).
