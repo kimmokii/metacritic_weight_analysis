@@ -87,7 +87,7 @@ $$
 where:
 
 - $\sigma$ is residual noise on the 0–100 scale
-- $\nu$ (dof) controls globally the likelihoods tail heaviness (robustness to outliers): small $\nu$ -> less penalty to outliers, large $\nu$ ($\nu$ -> $\infty$) becomes normal distributions, which penalizes outliers.
+- $\nu$ (dof) controls globally the likelihoods tail heaviness (robustness to outliers): small $\nu$ -> less penalty to outliers, large $\nu$ ($\nu$ -> $\infty$) Student's t becomes normal distributions, which penalizes outliers.
 
 Student’s t “expects surprises”: extreme metascore values are tolerated without dominating the critic weight estimates.
 
